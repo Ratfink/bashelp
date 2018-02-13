@@ -52,6 +52,20 @@ _bash_help () {
     fi
 
     # Check special cases
+    if [ "$cmd" = "sudo" ]
+    then
+        # Naive handling of sudo
+        # Doesn't figure out where the command is if options are passed to
+        # sudo, just shows the man page for sudo instead
+        token=${token#* }
+        local sudocmd=${token%% *}
+        # If there's a manual for this command, use that as cmd
+        if man -w "$sudocmd" &>/dev/null && [ "$sudocmd" = "${sudocmd#-}" ]
+        then
+            cmd="$sudocmd"
+        fi
+    fi
+
     if [ "$cmd" = "btrfs" -o "$cmd" = "flatpak" -o "$cmd" = "git" -o "$cmd" = "openssl" -o "$cmd" = "ostree" ]
     then
         local token_no_cmd=${token#* }
